@@ -94,15 +94,6 @@ namespace ABR_Tool
             InitializeComponent();
         }
 
-        public void UpdateProgress(int progress)
-        {
-            Dispatcher.Invoke((Action)(() =>
-            {
-                Generic_ProgressBar.Value = progress;
-            }));
-
-        }
-
         private void LoadABRFile(object sender, RoutedEventArgs e)
         {
 
@@ -125,10 +116,12 @@ namespace ABR_Tool
             openFileDialog.Filter = "Texture Archive (*.abr, *.efo, *.kmr)|*.abr; *.efo; *.kmr";
             openFileDialog.InitialDirectory = lastUsedABRPath;
             if (openFileDialog.ShowDialog() == true)
+            {
                 using (FileStream fs = File.OpenRead(openFileDialog.FileName))
                 {
                     current_file_path = openFileDialog.FileName;
                     original_file_name = System.IO.Path.GetFileName(openFileDialog.FileName);
+                    this.Title = "ABR Tool | " + original_file_name;
                     total_archive_size = new System.IO.FileInfo(current_file_path).Length;
 
                     lastUsedABRPath = System.IO.Path.GetDirectoryName(openFileDialog.FileName);
@@ -159,7 +152,7 @@ namespace ABR_Tool
 
                     int current_index = 0;
 
-                    foreach(long offset in foundDDSPositions)
+                    foreach (long offset in foundDDSPositions)
                     {
                         int foundTextureSize = 0;
                         fs.Position = offset - 4;
@@ -170,7 +163,7 @@ namespace ABR_Tool
                         byte[] headerBuffer = new byte[128];
                         fs.Read(headerBuffer, 0, 128);
                         Stream bufferStream = new MemoryStream(headerBuffer);
-                        
+
                         //foundTextureSize = GetTextureSize(bufferStream);
                         Console.WriteLine("Found a texture with size: " + foundTextureSize);
 
@@ -218,11 +211,12 @@ namespace ABR_Tool
                         try
                         {
                             foundEntry.mipmap_count = GetMipMapCount(image_stream);
-                        } catch
+                        }
+                        catch
                         {
                             foundEntry.mipmap_count = 0;
                         }
-                        
+
                         foundEntry.texture_index = current_index;
                         current_index++;
                         //HandleTextureBytes(file_index);
@@ -233,8 +227,11 @@ namespace ABR_Tool
                     MainGrid.UpdateLayout();
                     TextureListBox.ItemsSource = all_dds_files;
                 }
-
-
+            }
+            else
+            {
+                this.Title = "ABR Tool";
+            }
 
         }
         #region oldLoadCode

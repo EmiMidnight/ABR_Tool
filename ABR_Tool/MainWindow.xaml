@@ -11,7 +11,6 @@
     </Window.Resources>
     <Grid x:Name="MainGrid">
         <Button x:Name="LoadPacButton" Content="Load .ABR/.EFO" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="108" Click="LoadABRFile"/>
-        <ProgressBar x:Name="Generic_ProgressBar" HorizontalAlignment="Left" Height="20" Margin="612,10,0,0" VerticalAlignment="Top" Width="118"/>
         <ListBox x:Name="TextureListBox" Margin="10,44,10,10" VerticalContentAlignment="Top" Focusable="False" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
