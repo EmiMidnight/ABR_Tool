@@ -1,0 +1,77 @@
+﻿<Window x:Class="ABR_Tool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ABR_Tool"
+        mc:Ignorable="d"
+        Title="ABR Tool" Height="720" Width="750">
+    <Window.Resources>
+        <local:ByteToKilobyteConverter x:Key="ByteToKilobyteConverter" />
+    </Window.Resources>
+    <Grid x:Name="MainGrid">
+        <Button x:Name="LoadPacButton" Content="Load .ABR/.EFO" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="108" Click="LoadABRFile"/>
+        <ProgressBar x:Name="Generic_ProgressBar" HorizontalAlignment="Left" Height="20" Margin="612,10,0,0" VerticalAlignment="Top" Width="118"/>
+        <ListBox x:Name="TextureListBox" Margin="10,44,10,10" VerticalContentAlignment="Top" Focusable="False" HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="#FF898989" BorderThickness="0 0 0 1">
+                        <StackPanel Orientation="Horizontal" Margin="0 20 0 20">
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel.Background>
+                                    <ImageBrush ImageSource="grid.jpg" Stretch="UniformToFill" TileMode="Tile"/>
+                                </StackPanel.Background>
+                                <Image x:Name="TexturePreview" Width="300" Height="300" HorizontalAlignment="Center" Margin="15,15,15,15" VerticalAlignment="Center" Source="{Binding texture_bitmap}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="31,0,45,0" HorizontalAlignment="Stretch">
+                                <Label ContentStringFormat="Texture Name: {0}" VerticalAlignment="Center" FontSize="16">
+                                    <TextBlock Text="{Binding file_name}"/>
+                                </Label>
+                                <Label Content="{Binding texture_bitmap.Width}" ContentStringFormat="Width: {0}" VerticalAlignment="Center" FontSize="16"/>
+                                <Label Content="{Binding texture_bitmap.Height}" ContentStringFormat="Height: {0}" VerticalAlignment="Center" FontSize="16"/>
+                                <Label Content="{Binding surface_type}" ContentStringFormat="DDS Surface Type: {0}" VerticalAlignment="Center" FontSize="16"/>
+                                <Label Content="{Binding mipmap_count}" ContentStringFormat="DDS Mip Map Amount: {0}" VerticalAlignment="Center" FontSize="16"/>
+                                <Label Content="{Binding file_size, Converter={StaticResource ByteToKilobyteConverter}}" ContentStringFormat="Texture File Size: {0}" VerticalAlignment="Center" FontSize="16"/>
+                                <Button x:Name="ExportDDSButton" Content="Export .dds" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="125" Tag="{Binding texture_index}" Click="ExportDDS" />
+                                <Button x:Name="ImportDDSButton" Content="Import .dds" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="125" Tag="{Binding texture_index}" Click="ImportDDS" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical" 
+                           Height="Auto"
+                           Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=ActualWidth}"  Margin="5"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <!--<Setter Property="IsSelected" Value="{Binding Content.IsSelected, Mode=TwoWay, RelativeSource={RelativeSource Self}}"/> -->
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+
+        </ListBox>
+        <Button x:Name="SavePacButton" Content="Save .ABR/.EFO" HorizontalAlignment="Left" Margin="139,10,0,0" VerticalAlignment="Top" Width="110" Click="SaveArchiveFile" RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="-0.071"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Button.RenderTransform>
+        </Button>
+        <Button x:Name="ExportAllButton" Content="Export All" HorizontalAlignment="Left" Margin="305,10,0,0" VerticalAlignment="Top" Width="75" Click="ExportAllTextures"/>
+        <Button x:Name="ImportAllButton" Content="Import All" HorizontalAlignment="Left" Margin="394,10,0,0" VerticalAlignment="Top" Width="75" Click="ImportAllTextures"/>
+    </Grid>
+</Window>
