@@ -5,12 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ABR_Tool"
         mc:Ignorable="d"
-        Title="ABR Tool" Height="720" Width="750">
+        Title="ABR Tool" Height="720" Width="900"        
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
     <Window.Resources>
         <local:ByteToKilobyteConverter x:Key="ByteToKilobyteConverter" />
     </Window.Resources>
     <Grid x:Name="MainGrid">
-        <Button x:Name="LoadPacButton" Content="Load .ABR/.EFO" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="108" Click="LoadABRFile"/>
+        <Button x:Name="LoadPacButton" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top" Width="164" Click="LoadABRFile">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                <materialDesign:PackIcon Kind="FileImport" VerticalAlignment="Center" Margin="0,0,5,0" Height="20" Width="20"/>
+                <TextBlock Text="Load .ABR/.EFO" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
         <ListBox x:Name="TextureListBox" Margin="10,44,10,10" VerticalContentAlignment="Top" Focusable="False" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -24,7 +37,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Vertical" Margin="31,0,45,0" HorizontalAlignment="Stretch">
                                 <Label ContentStringFormat="Texture Name: {0}" VerticalAlignment="Center" FontSize="16">
-                                    <TextBlock Text="{Binding file_name}"/>
+                                    <TextBlock Text="{Binding file_name}" FontWeight="Bold"/>
                                 </Label>
                                 <Label Content="{Binding texture_bitmap.Width}" ContentStringFormat="Width: {0}" VerticalAlignment="Center" FontSize="16"/>
                                 <Label Content="{Binding texture_bitmap.Height}" ContentStringFormat="Height: {0}" VerticalAlignment="Center" FontSize="16"/>
@@ -60,17 +73,23 @@
             </ListBox.ItemContainerStyle>
 
         </ListBox>
-        <Button x:Name="SavePacButton" Content="Save .ABR/.EFO" HorizontalAlignment="Left" Margin="139,10,0,0" VerticalAlignment="Top" Width="110" Click="SaveArchiveFile" RenderTransformOrigin="0.5,0.5">
-            <Button.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="-0.071"/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </Button.RenderTransform>
+        <Button x:Name="SavePacButton" HorizontalAlignment="Left" Margin="198,10,0,0" VerticalAlignment="Top" Width="164" Click="SaveArchiveFile" RenderTransformOrigin="0.5,0.5">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="FileExport" VerticalAlignment="Center" Margin="0,0,5,0" Height="20" Width="20"/>
+                <TextBlock Text="Save .ABR/.EFO" VerticalAlignment="Center"/>
+            </StackPanel>
         </Button>
-        <Button x:Name="ExportAllButton" Content="Export All" HorizontalAlignment="Left" Margin="305,10,0,0" VerticalAlignment="Top" Width="75" Click="ExportAllTextures"/>
-        <Button x:Name="ImportAllButton" Content="Import All" HorizontalAlignment="Left" Margin="394,10,0,0" VerticalAlignment="Top" Width="75" Click="ImportAllTextures"/>
+        <Button x:Name="ExportAllButton" HorizontalAlignment="Right" Margin="0,9,15,0" VerticalAlignment="Top" Width="150" Click="ExportAllTextures">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="Export" VerticalAlignment="Center" Margin="0,0,5,0" Height="20" Width="20"/>
+                <TextBlock Text="Export All" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+        <Button x:Name="ImportAllButton" HorizontalAlignment="Right" Margin="0,8,185,0" VerticalAlignment="Top" Width="150" Click="ImportAllTextures">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="Import" VerticalAlignment="Center" Margin="0,0,5,0" Height="20" Width="20"/>
+                <TextBlock Text="Import All" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
     </Grid>
 </Window>

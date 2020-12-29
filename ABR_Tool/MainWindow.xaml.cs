@@ -557,15 +557,62 @@ namespace ABR_Tool
 
                 if (length != all_dds_files[texture_index].file_size)
                 {
-                    MessageBox.Show("New texture file size is smaller or bigger than the original.This is currently not supported. Cancelling import. Make sure you are using the right surface type and amount of mip maps.", "Import Error");
-                    return;
+                    using (FileStream fs = File.OpenRead(openFileDialog.FileName))
+                    {
+                        string imported_type = "";
+                        uint imported_mips = 0;
+                        fs.Position = 0;
+                        imported_type = GetSurfaceType(fs);
+                        fs.Position = 0;
+                        imported_mips = GetMipMapCount(fs);
+
+                        // Check if the surface type matches, and warn the user if it doesn't
+                        if (imported_type == all_dds_files[texture_index].surface_type)
+                        {
+                            Console.WriteLine("Surface type matches. Importing.");
+                        }
+                        else
+                        {
+                            MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, "Surface Type does not match original texture. \nThis might lead to wrong colors or other glitches ingame. \nTry importing anyway?", "Import Warning", MessageBoxButton.YesNo);
+                            switch (result)
+                            {
+                                case MessageBoxResult.Yes:
+                                    break;
+                                case MessageBoxResult.No:
+                                    return;
+                            }
+                        }
+
+                        // Check if the amount of mipmaps is correct
+                        if (imported_mips == all_dds_files[texture_index].mipmap_count)
+                        {
+                            Console.WriteLine("Correct amount of mipmaps. Importing.");
+                        }
+                        else
+                        {
+                            MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, "The amount of mipmaps does not match with the original texture. \nTry importing anyway?", "Import Warning", MessageBoxButton.YesNo);
+                            switch (result)
+                            {
+                                case MessageBoxResult.Yes:
+                                    break;
+                                case MessageBoxResult.No:
+                                    return;
+                            }
+                        }
+
+                        MessageBox.Show(Application.Current.MainWindow, "New texture file size is smaller or bigger than the original. \nThis is currently not supported. \nMake sure you are using the right surface type and amount of mip maps and also correct height and width. \nCancelling import.", "Import Error");
+                        return;
+                    } 
+
                 }
 
                 using (FileStream fs = File.OpenRead(openFileDialog.FileName))
                 {
                     string imported_type = "";
                     uint imported_mips = 0;
+                    fs.Position = 0;
                     imported_type = GetSurfaceType(fs);
+                    fs.Position = 0;
                     imported_mips = GetMipMapCount(fs);
 
                     // Check if the surface type matches, and warn the user if it doesn't
@@ -575,8 +622,8 @@ namespace ABR_Tool
                     } 
                     else
                     {
-                        MessageBoxResult result = MessageBox.Show("Surface Type does not match original texture. This might lead to wrong colors or other glitches ingame. Import anyway?", "Import Warning", MessageBoxButton.YesNo);
-                        switch(result)
+                        MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, "Surface Type does not match original texture. \nThis might lead to wrong colors or other glitches ingame. \nTry importing anyway?", "Import Warning", MessageBoxButton.YesNo);
+                        switch (result)
                         {
                             case MessageBoxResult.Yes:
                                 break;
@@ -592,7 +639,7 @@ namespace ABR_Tool
                     }
                     else
                     {
-                        MessageBoxResult result = MessageBox.Show("The amount of mipmaps does not match with the original texture. ", "Import Warning", MessageBoxButton.YesNo);
+                        MessageBoxResult result = MessageBox.Show("The amount of mipmaps does not match with the original texture. \nTry importing anyway?", "Import Warning", MessageBoxButton.YesNo);
                         switch (result)
                         {
                             case MessageBoxResult.Yes:
@@ -604,9 +651,6 @@ namespace ABR_Tool
 
                     all_dds_files[texture_index].texture_file = File.ReadAllBytes(openFileDialog.FileName);
                     HandleTextureBytes(texture_index);
-
-                    //long length = new File.ReadAllBytes(path).Length;
-
                 }
 
                 // Refresh Texture List
@@ -645,46 +689,6 @@ namespace ABR_Tool
             uint found_count = header.MipMapCount;
             //.WriteLine("Found Alpha bitmask: " + header.PixelFormat.ABitMask + "\n");
             return found_count;
-        }
-
-        [Obsolete("This does not actually get used, as the archive has the file size directly in front of the texture.")]
-        private int GetTextureSize(Stream texture_fs)
-        {
-            DdsHeader header = new DdsHeader(texture_fs);
-            string found_type = header.PixelFormat.FourCC.ToString();
-            Console.WriteLine("Found texture type: " + found_type);
-            int texture_size = 0;
-
-            texture_size = (int)header.PitchOrLinearSize + (int)header.Size + 11;
-            Console.WriteLine("Found a texture with size before mip maps:" + texture_size);
-            int current_height = (int)header.Height;
-            int current_width = (int)header.Width;
-
-            var len = (int)header.PitchOrLinearSize;
-            var totalLen = 0;
-
-            if (header.MipMapCount > 0)
-            {
-                for (int i = 1; i < header.MipMapCount; i++)
-                {
-                    current_height = current_height / 2;
-                    current_width = current_width / 2;
-
-                   int mipmap_size = current_height * current_width * 1;
-
-                    if (found_type == "D3DFMT_DXT5" || found_type == "D3DFMT_DXT3")
-                        //mipmap_size = mipmap_size / 2;
-                        mipmap_size = (current_height * current_width) * 4;
-
-                    if (found_type == "D3DFMT_DXT1")
-                        //mipmap_size = mipmap_size / 4;
-                        mipmap_size = (current_height * current_width) * 2;
-
-                    texture_size += mipmap_size;
-
-                }
-            }
-            return texture_size;
         }
 
         private void HandleTextureBytes(int file_index)
