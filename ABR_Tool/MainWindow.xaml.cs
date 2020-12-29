@@ -833,5 +833,21 @@ namespace ABR_Tool
         }
     }
 
+    public class SurfaceTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            //float convertedValue = (int)value / 1024;
+            //return System.Convert.ToInt32(convertedValue).ToString() + " KB";
+            string newFormat = (string)value;
+            return newFormat.Replace("D3DFMT", "");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value;
+        }
+    }
+
 }
 

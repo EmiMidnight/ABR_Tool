@@ -11,6 +11,8 @@ Changelog:
 - Added "Mip Map Amount" to each entry, so you can see whether or not you need to export with them in Photoshop. (And how many)
 - Importing/Exporting ABR and DDS files now store their last used folders, so you can easily work with two seperate folders without having to navigate to them each time.
 - Show the currently loaded archive name in the title bar, so you don't lose track of which file you are editing
+- Reworked the design of the app
+- Made the surface type more readable
 
 NOTES NOTES NOTES:
 This is an alpha version. It will be buggy and unstable.

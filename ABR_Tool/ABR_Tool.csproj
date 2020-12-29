@@ -58,7 +58,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>abr_icon.ico</ApplicationIcon>
+    <ApplicationIcon>abr_icon_new.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Costura, Version=3.3.3.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
@@ -139,6 +139,7 @@
     <Resource Include="grid.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="abr_icon_new.ico" />
     <Resource Include="abr_icon.ico" />
     <Content Include="ReadMe.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

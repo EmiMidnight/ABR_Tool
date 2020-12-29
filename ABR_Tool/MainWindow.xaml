@@ -16,9 +16,10 @@
         FontFamily="{DynamicResource MaterialDesignFont}">
     <Window.Resources>
         <local:ByteToKilobyteConverter x:Key="ByteToKilobyteConverter" />
+        <local:SurfaceTypeConverter x:Key="SurfaceTypeConverter" />
     </Window.Resources>
     <Grid x:Name="MainGrid">
-        <Button x:Name="LoadPacButton" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top" Width="164" Click="LoadABRFile">
+        <Button Foreground="White" x:Name="LoadPacButton" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top" Width="164" Click="LoadABRFile">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
                 <materialDesign:PackIcon Kind="FileImport" VerticalAlignment="Center" Margin="0,0,5,0" Height="20" Width="20"/>
                 <TextBlock Text="Load .ABR/.EFO" VerticalAlignment="Center"/>
@@ -41,11 +42,11 @@
                                 </Label>
                                 <Label Content="{Binding texture_bitmap.Width}" ContentStringFormat="Width: {0}" VerticalAlignment="Center" FontSize="16"/>
                                 <Label Content="{Binding texture_bitmap.Height}" ContentStringFormat="Height: {0}" VerticalAlignment="Center" FontSize="16"/>
-                                <Label Content="{Binding surface_type}" ContentStringFormat="DDS Surface Type: {0}" VerticalAlignment="Center" FontSize="16"/>
+                                <Label Content="{Binding surface_type, Converter={StaticResource SurfaceTypeConverter}}" ContentStringFormat="DDS Surface Type: {0}" VerticalAlignment="Center" FontSize="16"/>
                                 <Label Content="{Binding mipmap_count}" ContentStringFormat="DDS Mip Map Amount: {0}" VerticalAlignment="Center" FontSize="16"/>
                                 <Label Content="{Binding file_size, Converter={StaticResource ByteToKilobyteConverter}}" ContentStringFormat="Texture File Size: {0}" VerticalAlignment="Center" FontSize="16"/>
-                                <Button x:Name="ExportDDSButton" Content="Export .dds" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="125" Tag="{Binding texture_index}" Click="ExportDDS" />
-                                <Button x:Name="ImportDDSButton" Content="Import .dds" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="125" Tag="{Binding texture_index}" Click="ImportDDS" />
+                                <Button x:Name="ExportDDSButton" Foreground="White" Content="Export .dds" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="125" Tag="{Binding texture_index}" Click="ExportDDS" />
+                                <Button x:Name="ImportDDSButton" Foreground="White" Content="Import .dds" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="125" Tag="{Binding texture_index}" Click="ImportDDS" />
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -73,19 +74,19 @@
             </ListBox.ItemContainerStyle>
 
         </ListBox>
-        <Button x:Name="SavePacButton" HorizontalAlignment="Left" Margin="198,10,0,0" VerticalAlignment="Top" Width="164" Click="SaveArchiveFile" RenderTransformOrigin="0.5,0.5">
+        <Button x:Name="SavePacButton" Foreground="White" HorizontalAlignment="Left" Margin="198,10,0,0" VerticalAlignment="Top" Width="164" Click="SaveArchiveFile" RenderTransformOrigin="0.5,0.5">
             <StackPanel Orientation="Horizontal">
                 <materialDesign:PackIcon Kind="FileExport" VerticalAlignment="Center" Margin="0,0,5,0" Height="20" Width="20"/>
                 <TextBlock Text="Save .ABR/.EFO" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
-        <Button x:Name="ExportAllButton" HorizontalAlignment="Right" Margin="0,9,15,0" VerticalAlignment="Top" Width="150" Click="ExportAllTextures">
+        <Button Foreground="White" x:Name="ExportAllButton" HorizontalAlignment="Right" Margin="0,9,15,0" VerticalAlignment="Top" Width="150" Click="ExportAllTextures">
             <StackPanel Orientation="Horizontal">
                 <materialDesign:PackIcon Kind="Export" VerticalAlignment="Center" Margin="0,0,5,0" Height="20" Width="20"/>
                 <TextBlock Text="Export All" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
-        <Button x:Name="ImportAllButton" HorizontalAlignment="Right" Margin="0,8,185,0" VerticalAlignment="Top" Width="150" Click="ImportAllTextures">
+        <Button Foreground="White" x:Name="ImportAllButton" HorizontalAlignment="Right" Margin="0,8,185,0" VerticalAlignment="Top" Width="150" Click="ImportAllTextures">
             <StackPanel Orientation="Horizontal">
                 <materialDesign:PackIcon Kind="Import" VerticalAlignment="Center" Margin="0,0,5,0" Height="20" Width="20"/>
                 <TextBlock Text="Import All" VerticalAlignment="Center"/>
