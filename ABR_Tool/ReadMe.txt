@@ -13,6 +13,7 @@ Changelog:
 - Show the currently loaded archive name in the title bar, so you don't lose track of which file you are editing
 - Reworked the design of the app
 - Made the surface type more readable
+- Improved error messages when loading incompatible textures. It will now show you a comparison between old and new files in regards to Type and Mipmaps.
 
 NOTES NOTES NOTES:
 This is an alpha version. It will be buggy and unstable.

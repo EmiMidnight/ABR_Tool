@@ -77,8 +77,6 @@ namespace ABR_Tool
         string current_file_path = "";
         string original_file_name = "";
 
-        //ObservableCollection<TextureFileEntry> all_old_filesD = new ObservableCollection<TextureFileEntry>();
-
         ObservableCollection<DDSEntry> all_dds_files = new ObservableCollection<DDSEntry>();
         List<long> foundDDSPositions = new List<long>();
 
@@ -226,199 +224,23 @@ namespace ABR_Tool
 
                     MainGrid.UpdateLayout();
                     TextureListBox.ItemsSource = all_dds_files;
+                    MySnackbar.MessageQueue.Enqueue("Loaded archive " + original_file_name);
                 }
             }
             else
             {
+                MySnackbar.MessageQueue.Enqueue("No archive loaded.");
                 this.Title = "ABR Tool";
             }
 
         }
-        #region oldLoadCode
-        private void LoadPacFile(object sender, RoutedEventArgs e)
-        {
-           /*
-            foreach (var handle in handles)
-            {
-                handle.Free();
-            }
-
-            all_dds_files.Clear();
-            position_file_name_list = 0;
-            position_start_first_file = 0;
-            all_file_names.Clear();
-            Generic_ProgressBar.Value = 0;
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == true)
-                using (FileStream fs = File.OpenRead(openFileDialog.FileName))
-                {
-                    current_file_path = openFileDialog.FileName;
-                    original_file_name = System.IO.Path.GetFileName(openFileDialog.FileName);
-                    total_archive_size = new System.IO.FileInfo(current_file_path).Length;
-
-                    Thread thread = new Thread(delegate ()
-                    {
-                        UpdateProgress(0);
-                    });
-                    thread.IsBackground = false;
-                    thread.Start();
-
-                    byte[] b = new byte[4];
-                    UTF8Encoding temp = new UTF8Encoding(true);
-
-                    fs.Read(b, 0, 4); // Get Magic
-                    Console.WriteLine("Magic: " + temp.GetString(b));
-                    Generic_ProgressBar.Value = 10;
-                    if (temp.GetString(b) != "pack")
-                    {
-                        MessageBox.Show("Error: Not a valid pac file.");
-                        return;
-                    }
-
-                    int current_texture_index = 0;
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).UpdateLayout();
-                    b.CopyTo(magic, 0);
-                    fs.Read(b, 0, 4); // Get amount of files
-                    amount_of_files = BitConverter.ToInt32(b, 0);
-                    Console.WriteLine("Number of texture files: " + amount_of_files.ToString());
-                    fs.Read(b, 0, 4); // Get total size of all files
-                    total_size_of_files = BitConverter.ToInt32(b, 0);
-                    Console.WriteLine("Total filesize of all textures: " + total_size_of_files.ToString());
-                    fs.Read(b, 0, 4); // Get total size of all files
-                    header_size = BitConverter.ToInt32(b, 0);
-                    Console.WriteLine("Header size: " + header_size.ToString());
-                    fs.Read(unknown_header, 0, 8); // Read the unknown header bits.
-                    fs.Read(header_padding, 0, 8); // Header padding
-                    thread = new Thread(delegate ()
-                    {
-                        UpdateProgress(10);
-                    });
-
-                    int progressbar_per_file = 0;
-                    progressbar_per_file = 80 / amount_of_files;
-
-                    // iterate through the file headers
-                    for (int i = 0; i < amount_of_files; i++)
-                    {
-                        TextureFileEntry current_file_entry = new TextureFileEntry();
-                        fs.Read(b, 0, 4); // Get File_size
-                        current_file_entry.file_size = BitConverter.ToInt32(b, 0);
-                        fs.Read(b, 0, 4); // Get Unknown 1
-                        current_file_entry.unknown1 = BitConverter.ToInt32(b, 0);
-                        fs.Read(b, 0, 4); // Get Unknown 2
-                        current_file_entry.unknown2 = BitConverter.ToInt32(b, 0);
-                        fs.Read(b, 0, 4); // Get next_offset
-                        current_file_entry.next_offset = BitConverter.ToInt32(b, 0);
-
-                        current_file_entry.texture_index = current_texture_index;
-                        current_texture_index++;
-
-                        //all_dds_files.Add(current_file_entry);
-                        
-                        int progress = (int)Generic_ProgressBar.Value + progressbar_per_file;
-                        thread = new Thread(delegate ()
-                        {
-                            UpdateProgress(progress);
-                        });
-                    }
-                    
-                    if (amount_of_files % 2 == 1)
-                    {
-                        // archives where the file amount can't be evenly split in half get 16 bytes of padding added to the end of the header 
-                        byte[] weird_padding = new byte[16];
-                        fs.Read(weird_padding, 0, 16);
-                    }
-
-                    position_start_first_file = fs.Position;
-
-                    // get the actual files
-                    for (int file_index = 0; file_index < amount_of_files; file_index++)
-                    {
-                        // Read the texture into memory
-                        Console.WriteLine("Trying to allocate " + all_dds_files[file_index].file_size.ToString());
-                        byte[] texture_bytes = new byte[all_dds_files[file_index].file_size];
-                        all_dds_files[file_index].stream_position = fs.Position;
-                        fs.Read(texture_bytes, 0, texture_bytes.Length);
-                        all_dds_files[file_index].texture_file = new byte[all_dds_files[file_index].file_size];
-                        texture_bytes.CopyTo(all_dds_files[file_index].texture_file, 0);
-                        Console.WriteLine("Texture is " + all_dds_files[file_index].texture_file.Length.ToString() + " bytes long");
-                        if (all_dds_files[file_index].next_offset != 0)
-                        {
-                            fs.Position = all_dds_files[file_index].next_offset + position_start_first_file;
-                        }
-                        else
-                        {
-
-                        }
-                        // Convert texture file to a bitmap source for preview purposes
-                        /*Stream image_stream = new MemoryStream(all_dds_files[file_index].texture_file);
-                        IImage image = Pfim.Pfim.FromStream(image_stream);
-                        all_dds_files[file_index].texture_bitmap = WpfImageSource(image);
-                        image_stream.Position = 0;
-                        all_dds_files[file_index].surface_type = GetSurfaceType(image_stream);
-                        */
-                        /*
-                        HandleTextureBytes(file_index);
-
-                    }
-                    Generic_ProgressBar.Value = 90;
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).UpdateLayout();
-                    // Go to position of file name list
-                    position_file_name_list = position_start_first_file + total_size_of_files;
-                    fs.Position = position_file_name_list;
-
-                    // Read the entire file name list (so till end of file) into one stream, and split afterwards
-                    long size_of_rest_of_file = fs.Length - fs.Position;
-                    byte terminator = 0x00;
-                    byte[] name_list_buffer = new byte[size_of_rest_of_file];
-                    for (int file_name_index = 0; file_name_index < amount_of_files; file_name_index++)
-                    {
-                        byte[] char_buffer = new byte[1];
-                        fs.Read(char_buffer, 0, 1);
-                        string name_buffer = "";
-                        for (int buffer_index = 0; buffer_index < 10000; buffer_index++)
-                        {
-                            if(!char_buffer[0].Equals(terminator))
-                            {
-                                
-                                Console.WriteLine("Reading char");
-                                name_buffer += System.Text.Encoding.UTF8.GetString(char_buffer);
-                                fs.Read(char_buffer, 0, 1);
-                            }
-                            else
-                            {
-                                buffer_index = 20000;
-                                Console.WriteLine("Reading STOPPED");
-                            }
-                        }
-
-                        all_dds_files[file_name_index].file_name = name_buffer;
-                        Console.WriteLine("Found texture name buffer: " + name_buffer);
-                        //name_buffer = "";
-                    }
-
-                    for(int i = 0; i < amount_of_files; i++)
-                    {
-                        Console.WriteLine("Found texture: " + all_dds_files[i].file_name);
-                    }
-                    Generic_ProgressBar.Value = 100;
-                    MainGrid.UpdateLayout();
-                    TextureListBox.ItemsSource = all_dds_files;
-                }
-        */
-                    }
-        #endregion
+   
         private void SaveArchiveFile(object sender, RoutedEventArgs e)
         {
             
             int archive_size_integer = (int)total_archive_size;
             Stream new_stream = new MemoryStream(archive_size_integer);
-            //Stream pac_file_stream = new MemoryStream(File.ReadAllBytes(current_file_path));
-            // Load original .pac archive into memory
+            // Load original  archive into memory
             using (Stream stream = File.OpenRead(current_file_path))
             {
                 stream.CopyTo(new_stream);
@@ -447,6 +269,7 @@ namespace ABR_Tool
                     new_stream.Position = 0;
                     new_stream.CopyTo(outputFileStream);
                 }
+                MySnackbar.MessageQueue.Enqueue("Saved archive");
             }
         }
 
@@ -536,7 +359,9 @@ namespace ABR_Tool
                 Properties.Settings.Default.lastDDSPath = lastUsedDDSPath;
                 Properties.Settings.Default.Save();
                 File.WriteAllBytes(saveFileDialog.FileName, all_dds_files[texture_index].texture_file);
+                MySnackbar.MessageQueue.Enqueue("Exported texture successfully.");
             }
+
         }
 
         private void ImportDDS(object sender, RoutedEventArgs e)
@@ -573,7 +398,7 @@ namespace ABR_Tool
                         }
                         else
                         {
-                            MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, "Surface Type does not match original texture. \nThis might lead to wrong colors or other glitches ingame. \nTry importing anyway?", "Import Warning", MessageBoxButton.YesNo);
+                            MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, "Surface Type does not match original texture. \nThis might lead to wrong colors or other glitches ingame. \nTry importing anyway?\n\nOriginal Type: " + ShortDDSType(all_dds_files[texture_index].surface_type) + "\nNew Type: " + ShortDDSType(imported_type), "Import Warning", MessageBoxButton.YesNo);
                             switch (result)
                             {
                                 case MessageBoxResult.Yes:
@@ -590,7 +415,7 @@ namespace ABR_Tool
                         }
                         else
                         {
-                            MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, "The amount of mipmaps does not match with the original texture. \nTry importing anyway?", "Import Warning", MessageBoxButton.YesNo);
+                            MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, "The amount of mipmaps does not match with the original texture. \nTry importing anyway?\n\nOriginal Mipmap count: " + all_dds_files[texture_index].mipmap_count.ToString() + "\nNew count: " + imported_mips.ToString(), "Import Warning", MessageBoxButton.YesNo);
                             switch (result)
                             {
                                 case MessageBoxResult.Yes:
@@ -622,7 +447,7 @@ namespace ABR_Tool
                     } 
                     else
                     {
-                        MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, "Surface Type does not match original texture. \nThis might lead to wrong colors or other glitches ingame. \nTry importing anyway?", "Import Warning", MessageBoxButton.YesNo);
+                        MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, "Surface Type does not match original texture. \nThis might lead to wrong colors or other glitches ingame. \nTry importing anyway?\n\nOriginal Type: " + ShortDDSType(all_dds_files[texture_index].surface_type) + "\nNew Type: " + ShortDDSType(imported_type), "Import Warning", MessageBoxButton.YesNo);
                         switch (result)
                         {
                             case MessageBoxResult.Yes:
@@ -639,7 +464,7 @@ namespace ABR_Tool
                     }
                     else
                     {
-                        MessageBoxResult result = MessageBox.Show("The amount of mipmaps does not match with the original texture. \nTry importing anyway?", "Import Warning", MessageBoxButton.YesNo);
+                        MessageBoxResult result = MessageBox.Show(Application.Current.MainWindow, "The amount of mipmaps does not match with the original texture. \nTry importing anyway?\n\nOriginal Mipmap count: " + all_dds_files[texture_index].mipmap_count.ToString() + "\nNew count: " + imported_mips.ToString(), "Import Warning", MessageBoxButton.YesNo);
                         switch (result)
                         {
                             case MessageBoxResult.Yes:
@@ -653,6 +478,7 @@ namespace ABR_Tool
                     HandleTextureBytes(texture_index);
                 }
 
+                MySnackbar.MessageQueue.Enqueue("Imported texture successfully.");
                 // Refresh Texture List
                 TextureListBox.ItemsSource = null;
                 MainGrid.UpdateLayout();
@@ -667,7 +493,7 @@ namespace ABR_Tool
         {
             DdsHeader header = new DdsHeader(texture_fs);
             string found_type = header.PixelFormat.FourCC.ToString();
-            //Console.WriteLine(header.PixelFormat.FourCC.ToString());
+            Console.WriteLine(header.PixelFormat.FourCC.ToString());
             if (header.PixelFormat.FourCC.ToString() == "DX10")
             {
                 var header10 = new DdsHeaderDxt10(texture_fs);
@@ -687,7 +513,6 @@ namespace ABR_Tool
         {
             DdsHeader header = new DdsHeader(texture_fs);
             uint found_count = header.MipMapCount;
-            //.WriteLine("Found Alpha bitmask: " + header.PixelFormat.ABitMask + "\n");
             return found_count;
         }
 
@@ -705,6 +530,14 @@ namespace ABR_Tool
         {
             // Convert texture file to a bitmap source for preview purposes
             return WpfImageSource(image);
+        }
+
+        public string ShortDDSType(string original)
+        {
+            //float convertedValue = (int)value / 1024;
+            //return System.Convert.ToInt32(convertedValue).ToString() + " KB";
+            string newFormat = (string)original;
+            return newFormat.Replace("D3DFMT_", "");
         }
 
         private void ExportAllTextures(object sender, RoutedEventArgs e)
@@ -759,7 +592,7 @@ namespace ABR_Tool
 
                     for (int texture_index = 0; texture_index < all_dds_files.Count; texture_index++)
                     {
-                        string currentTexturePath = importFolder + "/" + all_dds_files[texture_index].file_name + ".dds";
+                        string currentTexturePath = importFolder + "/" + all_dds_files[texture_index].file_name;
                         Console.WriteLine("Trying to import " + all_dds_files[texture_index].file_name);
 
                         if(File.Exists(currentTexturePath))
@@ -840,7 +673,7 @@ namespace ABR_Tool
             //float convertedValue = (int)value / 1024;
             //return System.Convert.ToInt32(convertedValue).ToString() + " KB";
             string newFormat = (string)value;
-            return newFormat.Replace("D3DFMT", "");
+            return newFormat.Replace("D3DFMT_", "");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
